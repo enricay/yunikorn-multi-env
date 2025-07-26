@@ -7,6 +7,7 @@ resources:
   - namespace.yaml
   - repository.yaml
   - release.yaml
+  - poddisruptionbudget.yaml
 
 commonLabels:
   app.kubernetes.io/name: yunikorn

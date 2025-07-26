@@ -1,0 +1,15 @@
+apiVersion: policy/v1
+kind: PodDisruptionBudget
+metadata:
+  name: yunikorn-scheduler-pdb
+  namespace: yunikorn
+  labels:
+    app.kubernetes.io/name: yunikorn
+    app.kubernetes.io/component: scheduler
+    app.kubernetes.io/managed-by: flux
+spec:
+  minAvailable: 1
+  selector:
+    matchLabels:
+      app: yunikorn
+      component: yunikorn-scheduler

@@ -114,3 +114,18 @@ patches:
                   values:
                   - yunikorn
               topologyKey: kubernetes.io/hostname
+  
+  # Update PodDisruptionBudget for production namespace
+  - target:
+      kind: PodDisruptionBudget
+      name: yunikorn-scheduler-pdb
+    patch: |-
+      - op: replace
+        path: /metadata/namespace
+        value: yunikorn-prod
+      - op: add
+        path: /metadata/labels/environment
+        value: "production"
+      - op: add
+        path: /spec/selector/matchLabels/environment
+        value: "production"
