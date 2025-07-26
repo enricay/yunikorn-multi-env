@@ -1,0 +1,90 @@
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: yunikorn
+  namespace: yunikorn
+spec:
+  releaseName: yunikorn
+  chart:
+    spec:
+      chart: yunikorn
+      version: 1.6.3
+      sourceRef:
+        kind: HelmRepository
+        name: yunikorn
+        namespace: flux-system
+  interval: 10m
+  timeout: 5m
+  install:
+    remediation:
+      retries: 3
+  upgrade:
+    remediation:
+      retries: 3
+  driftDetection:
+    mode: enabled
+  values:
+    serviceAccount: yunikorn-admin
+    
+    image:
+      pullPolicy: IfNotPresent
+      repository: apache/yunikorn
+      tag: 1.6.3
+    
+    # When this flag is true, the admission controller will be installed along with the scheduler.
+    # When this flag is false, the admission controller will not be installed.
+    embedAdmissionController: false
+    
+    # When this flag is true, the scheduler will be deployed as Kubernetes scheduler plugin.
+    # When this flag is false, the scheduler will be deployed as a standalone scheduler.
+    enableSchedulerPlugin: false
+    
+    # Base node affinity - prefer workload nodes (spotpool and demandpool)
+    affinity:
+      nodeAffinity:
+        preferredDuringSchedulingIgnoredDuringExecution:
+          - weight: 50
+            preference:
+              matchExpressions:
+                - key: workload
+                  operator: In
+                  values:
+                    - spotpool
+          - weight: 30
+            preference:
+              matchExpressions:
+                - key: workload
+                  operator: In
+                  values:
+                    - demandpool
+    
+    web:
+      image:
+        pullPolicy: IfNotPresent
+        repository: apache/yunikorn-web
+        tag: 1.6.3
+      resources:
+        requests:
+          memory: 256Mi
+          cpu: 50m
+        limits:
+          memory: 512Mi
+          cpu: 200m
+    
+    service:
+      type: ClusterIP
+      port: 9080
+      portWeb: 9889
+    
+    resources:
+      requests:
+        cpu: 200m
+        memory: 512Mi
+      limits:
+        memory: 1Gi
+        cpu: 500m
+    
+    goMemoryLimit: 768MiB
+    
+    podLabels:
+      app.kubernetes.io/name: "yunikorn"

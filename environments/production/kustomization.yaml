@@ -1,0 +1,107 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+metadata:
+  name: yunikorn-production
+
+# Use base configuration
+resources:
+  - ../../base
+
+# Add environment-specific labels
+commonLabels:
+  environment: production
+  app.kubernetes.io/instance: yunikorn-production
+
+# Namespace suffix for production
+nameSuffix: -prod
+
+# Environment-specific patches
+patches:
+  # High resources for production environment
+  - target:
+      kind: HelmRelease
+      name: yunikorn
+    patch: |-
+      - op: replace
+        path: /spec/values/resources/limits/cpu
+        value: "2000m"
+      - op: replace
+        path: /spec/values/resources/limits/memory
+        value: "4Gi"
+      - op: replace
+        path: /spec/values/resources/requests/cpu
+        value: "500m"
+      - op: replace
+        path: /spec/values/resources/requests/memory
+        value: "1Gi"
+      - op: replace
+        path: /spec/values/web/resources/limits/cpu
+        value: "1000m"
+      - op: replace
+        path: /spec/values/web/resources/limits/memory
+        value: "1Gi"
+      - op: replace
+        path: /spec/values/web/resources/requests/cpu
+        value: "200m"
+      - op: replace
+        path: /spec/values/web/resources/requests/memory
+        value: "512Mi"
+      - op: replace
+        path: /spec/values/goMemoryLimit
+        value: "2Gi"
+  
+  # Update namespace name
+  - target:
+      kind: HelmRelease
+      name: yunikorn
+    patch: |-
+      - op: replace
+        path: /metadata/namespace
+        value: yunikorn-prod
+      
+  # Production-specific node affinity (prefer demandpool over spotpool for stability)
+  - target:
+      kind: HelmRelease
+      name: yunikorn
+    patch: |-
+      - op: replace
+        path: /spec/values/affinity/nodeAffinity/preferredDuringSchedulingIgnoredDuringExecution/0/weight
+        value: 80
+      - op: replace
+        path: /spec/values/affinity/nodeAffinity/preferredDuringSchedulingIgnoredDuringExecution/0/preference/matchExpressions/0/values/0
+        value: demandpool
+      - op: replace
+        path: /spec/values/affinity/nodeAffinity/preferredDuringSchedulingIgnoredDuringExecution/1/weight
+        value: 20
+      - op: replace
+        path: /spec/values/affinity/nodeAffinity/preferredDuringSchedulingIgnoredDuringExecution/1/preference/matchExpressions/0/values/0
+        value: spotpool
+      
+  # Add production-specific configurations
+  - target:
+      kind: HelmRelease
+      name: yunikorn
+    patch: |-
+      - op: add
+        path: /spec/values/podLabels/environment
+        value: "production"
+      - op: add
+        path: /spec/values/tolerations
+        value:
+          - key: "production"
+            operator: "Equal"
+            value: "true"
+            effect: "NoSchedule"
+      - op: add
+        path: /spec/values/affinity/podAntiAffinity
+        value:
+          preferredDuringSchedulingIgnoredDuringExecution:
+          - weight: 100
+            podAffinityTerm:
+              labelSelector:
+                matchExpressions:
+                - key: app.kubernetes.io/name
+                  operator: In
+                  values:
+                  - yunikorn
+              topologyKey: kubernetes.io/hostname

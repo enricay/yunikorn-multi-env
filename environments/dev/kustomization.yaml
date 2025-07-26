@@ -1,0 +1,69 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+metadata:
+  name: yunikorn-dev
+
+# Use base configuration
+resources:
+  - ../../base
+
+# Add environment-specific labels
+commonLabels:
+  environment: dev
+  app.kubernetes.io/instance: yunikorn-dev
+
+# Namespace suffix for dev
+nameSuffix: -dev
+
+# Environment-specific patches
+patches:
+  # Reduce resources for dev environment
+  - target:
+      kind: HelmRelease
+      name: yunikorn
+    patch: |-
+      - op: replace
+        path: /spec/values/resources/limits/cpu
+        value: "200m"
+      - op: replace
+        path: /spec/values/resources/limits/memory
+        value: "256Mi"
+      - op: replace
+        path: /spec/values/resources/requests/cpu
+        value: "50m"
+      - op: replace
+        path: /spec/values/resources/requests/memory
+        value: "128Mi"
+      - op: replace
+        path: /spec/values/web/resources/limits/cpu
+        value: "100m"
+      - op: replace
+        path: /spec/values/web/resources/limits/memory
+        value: "256Mi"
+      - op: replace
+        path: /spec/values/web/resources/requests/cpu
+        value: "25m"
+      - op: replace
+        path: /spec/values/web/resources/requests/memory
+        value: "128Mi"
+      - op: replace
+        path: /spec/values/goMemoryLimit
+        value: "256MiB"
+  
+  # Update namespace name
+  - target:
+      kind: HelmRelease
+      name: yunikorn
+    patch: |-
+      - op: replace
+        path: /metadata/namespace
+        value: yunikorn-dev
+      
+  # Add dev-specific labels
+  - target:
+      kind: HelmRelease
+      name: yunikorn
+    patch: |-
+      - op: add
+        path: /spec/values/podLabels/environment
+        value: "dev"
