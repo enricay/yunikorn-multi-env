@@ -67,9 +67,6 @@ patches:
       - op: add
         path: /spec/values/podLabels/environment
         value: "staging"
-      - op: add
-        path: /spec/values/nodeSelector/environment
-        value: "staging"
   
   # Update PodDisruptionBudget for staging namespace
   - target:
