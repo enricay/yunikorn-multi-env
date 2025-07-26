@@ -57,7 +57,7 @@ patches:
         value: "512Mi"
       - op: replace
         path: /spec/values/goMemoryLimit
-        value: "2Gi"
+        value: "2GiB"
   
   # Update namespace name
   - target:
