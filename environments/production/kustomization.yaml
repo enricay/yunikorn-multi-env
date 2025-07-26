@@ -14,9 +14,18 @@ commonLabels:
 
 # Namespace suffix for production
 nameSuffix: -prod
+namePrefix: ""
 
 # Environment-specific patches
 patches:
+  # Update namespace name to yunikorn-prod
+  - target:
+      kind: Namespace
+      name: yunikorn
+    patch: |-
+      - op: replace
+        path: /metadata/name
+        value: yunikorn-prod
   # High resources for production environment
   - target:
       kind: HelmRelease
