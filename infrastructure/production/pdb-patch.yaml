@@ -1,0 +1,9 @@
+- op: replace
+  path: /metadata/namespace
+  value: yunikorn-prod
+- op: add
+  path: /metadata/labels/environment
+  value: "production"
+- op: add
+  path: /spec/selector/matchLabels/environment
+  value: "production"

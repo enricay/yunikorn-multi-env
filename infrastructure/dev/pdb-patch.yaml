@@ -1,0 +1,9 @@
+- op: replace
+  path: /metadata/namespace
+  value: yunikorn-dev
+- op: add
+  path: /metadata/labels/environment
+  value: "dev"
+- op: add
+  path: /spec/selector/matchLabels/environment
+  value: "dev"

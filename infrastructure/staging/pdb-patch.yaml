@@ -1,0 +1,9 @@
+- op: replace
+  path: /metadata/namespace
+  value: yunikorn-staging
+- op: add
+  path: /metadata/labels/environment
+  value: "staging"
+- op: add
+  path: /spec/selector/matchLabels/environment
+  value: "staging"
