@@ -26,11 +26,6 @@ spec:
   values:
     serviceAccount: yunikorn-admin
     
-    image:
-      pullPolicy: IfNotPresent
-      repository: apache/yunikorn
-      tag: 1.6.3
-    
     # When this flag is true, the admission controller will be installed along with the scheduler.
     # When this flag is false, the admission controller will not be installed.
     embedAdmissionController: false
@@ -59,10 +54,6 @@ spec:
                     - demandpool
     
     web:
-      image:
-        pullPolicy: IfNotPresent
-        repository: apache/yunikorn-web
-        tag: 1.6.3
       resources:
         requests:
           memory: 256Mi
