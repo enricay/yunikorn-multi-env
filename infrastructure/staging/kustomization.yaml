@@ -17,6 +17,14 @@ nameSuffix: -staging
 
 # Environment-specific patches
 patches:
+  # Update namespace name to yunikorn-staging
+  - target:
+      kind: Namespace
+      name: yunikorn
+    patch: |-
+      - op: replace
+        path: /metadata/name
+        value: yunikorn-staging
   # Moderate resources for staging environment
   - target:
       kind: HelmRelease

@@ -17,6 +17,14 @@ nameSuffix: -dev
 
 # Environment-specific patches
 patches:
+  # Update namespace name to yunikorn-dev
+  - target:
+      kind: Namespace
+      name: yunikorn
+    patch: |-
+      - op: replace
+        path: /metadata/name
+        value: yunikorn-dev
   # Reduce resources for dev environment
   - target:
       kind: HelmRelease
