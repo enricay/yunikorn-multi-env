@@ -28,7 +28,7 @@ spec:
     
     # When this flag is true, the admission controller will be installed along with the scheduler.
     # When this flag is false, the admission controller will not be installed.
-    embedAdmissionController: false
+    embedAdmissionController: true
     
     # Admission controller replica configuration
     admissionController:
